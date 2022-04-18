@@ -8,21 +8,28 @@
 # Author:  Paul Crozier (Sandia)
 
 # print out 2 atoms less than maxcut apart (with PBC)
-
+import sys
 from math import sqrt
+from src.dump import dump
 
-if len(argv) < 3:
-  raise StandardError,"distance.py maxcut dump.file1 dump.file2 ..."
+if len(sys.argv) < 3:
+  raise Exception("distance.py maxcut dump.file1 dump.file2 ...")
   
-maxcut = float(argv[1])
+maxcut = float(sys.argv[3])
 maxcut_sq = maxcut*maxcut
-  
-files = ' '.join(argv[2:])		        # dump files
+print(sys.argv[4:])
+files = ' '.join(sys.argv[4:])		        # dump files
 d = dump(files,0)
-d.map(1,"id",2,"type",3,"x",4,"y",5,"z")
+print('tolu1')
+print(d)
+pri = d.map(1,"id",2,"type",3,"x",4,"y",5,"z")
+print('tolu2')
+print(pri)
 
 while 1:
-  time = d.next()
+  time = next(d)
+  print('tolu3')
+  print(time)
   if time < 0: break
   d.unscale(time)
 
@@ -36,8 +43,8 @@ while 1:
   yprd = box[4] - box[1]
   zprd = box[5] - box[2]
   
-  for i in xrange(n):
-    for j in xrange(i+1,n):
+  for i in range(n):
+    for j in range(i+1,n):
   
       delx = x[j] - x[i]
       if abs(delx) > 0.5*xprd:
@@ -65,11 +72,11 @@ while 1:
           rsq = delx*delx + dely*dely + delz*delz
           
           if rsq < maxcut_sq: 
-            print "time = %d, id[i] = %d, id[j] = %d," \
+            print("time = %d, id[i] = %d, id[j] = %d," \
                " type[i] = %d, type[j] = %d, distance = %g" % \
-              (time, id[i], id[j], type[i], type[j], sqrt(rsq))
+              (time, id[i], id[j], type[i], type[j], sqrt(rsq)))
 
   d.tselect.none()
   d.tselect.one(time)
-  print "timestep = ", time
+  print("timestep = ", time)
   d.delete()
